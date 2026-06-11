@@ -185,6 +185,11 @@ async function saveToCloud() {
   collectAll();
   try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
   try {
+    // always fetch fresh sha before writing
+    if (!fileSha) {
+      const meta = await fetch(GH_API, {headers:{'Authorization':'token '+GH_TOKEN,'User-Agent':'tippspiel'}});
+      if (meta.ok) { const md = await meta.json(); fileSha = md.sha; }
+    }
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(DB))));
     const body = {message:'update tipps', content: content};
     if (fileSha) body.sha = fileSha;
@@ -203,7 +208,7 @@ async function saveToCloud() {
     setSyncStatus('ok','Gespeichert ✓');
     calcScores();
   } catch(e) {
-    setSyncStatus('error','Fehler: ' + e.message);
+    setSyncStatus('error','Fehler: ' + e.message.substring(0,60));
   }
 }
 
