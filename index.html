@@ -136,14 +136,19 @@ const GH_REPO  = 'wm-tippspiel-2026';
 const GH_FILE  = 'data.json';
 const GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
 let fileSha = null;
-let GH_TOKEN = localStorage.getItem('wm26_ghtoken') || '';
-function ensureToken() {
-  if (!GH_TOKEN) {
-    GH_TOKEN = prompt('Einmalig: GitHub Token eingeben (wird lokal gespeichert):') || '';
-    if (GH_TOKEN) localStorage.setItem('wm26_ghtoken', GH_TOKEN);
+let GH_TOKEN = '';
+function initToken() {
+  // Load from hash first (first-time setup via URL), then localStorage
+  const hash = window.location.hash.replace('#','');
+  if (hash && hash.startsWith('ghp_')) {
+    GH_TOKEN = hash;
+    localStorage.setItem('wm26_ghtoken', hash);
+    history.replaceState(null,'',window.location.pathname); // remove from URL
+  } else {
+    GH_TOKEN = localStorage.getItem('wm26_ghtoken') || '';
   }
-  return !!GH_TOKEN;
 }
+function ensureToken() { return !!GH_TOKEN; }
 const PERSONS = ["Mama", "Papa", "Lennox", "Phil"];
 const ALL_GIDS = ["a1", "a2", "a3", "a4", "a5", "a6", "b1", "b2", "b3", "b4", "b5", "b6", "c1", "c2", "c3", "c4", "c5", "c6", "d1", "d2", "d3", "d4", "d5", "d6", "de1", "e2", "de2", "e3", "de3", "e6", "f1", "f2", "f3", "f4", "f5", "f6", "g1", "g2", "g3", "g4", "g5", "g6", "h1", "h2", "h3", "h4", "h5", "h6", "i1", "i2", "i3", "i4", "i5", "i6", "j1", "j2", "j3", "j4", "j5", "j6", "k1", "k2", "k3", "k4", "k5", "k6", "l1", "l2", "l3", "l4", "l5", "l6", "r32_1", "r32_2", "r32_3", "r32_4", "r32_5", "r32_6", "r32_7", "r32_8", "r32_9", "r32_10", "r32_11", "r32_12", "r32_13", "r32_14", "r32_15", "r32_16", "r16_1", "r16_2", "r16_3", "r16_4", "r16_5", "r16_6", "r16_7", "r16_8", "qf_1", "qf_2", "qf_3", "qf_4", "sf_1", "sf_2", "p3", "fin"];
 
@@ -324,6 +329,7 @@ function calcScores() {
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  initToken();
   const gt=document.getElementById('gt-A');
   if(gt){gt.classList.add('active');document.getElementById('gp-A').classList.add('active');}
   hlAll();
