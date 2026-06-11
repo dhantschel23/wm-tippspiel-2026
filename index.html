@@ -110,7 +110,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
   </div>
   <div class="sync-bar">
     <span class="sync-dot" id="sync-dot"></span>
-    <span id="sync-label">Verbinde…</span>
+    <span id="sync-label">Bereit</span>
   </div>
 </header>
 <nav class="nav-tabs">
@@ -130,8 +130,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
   <button class="btn btn-primary" onclick="forceSave()">Jetzt speichern</button>
 </div>
 <script>
-// Firebase Realtime Database storage
-const FB_URL = 'https://wm-tippspiel-e7cf6-default-rtdb.europe-west1.firebasedatabase.app';
+// Local save via file download
 const PERSONS = ["Mama", "Papa", "Lennox", "Phil"];
 const ALL_GIDS = ["a1", "a2", "a3", "a4", "a5", "a6", "b1", "b2", "b3", "b4", "b5", "b6", "c1", "c2", "c3", "c4", "c5", "c6", "d1", "d2", "d3", "d4", "d5", "d6", "de1", "e2", "de2", "e3", "de3", "e6", "f1", "f2", "f3", "f4", "f5", "f6", "g1", "g2", "g3", "g4", "g5", "g6", "h1", "h2", "h3", "h4", "h5", "h6", "i1", "i2", "i3", "i4", "i5", "i6", "j1", "j2", "j3", "j4", "j5", "j6", "k1", "k2", "k3", "k4", "k5", "k6", "l1", "l2", "l3", "l4", "l5", "l6", "r32_1", "r32_2", "r32_3", "r32_4", "r32_5", "r32_6", "r32_7", "r32_8", "r32_9", "r32_10", "r32_11", "r32_12", "r32_13", "r32_14", "r32_15", "r32_16", "r16_1", "r16_2", "r16_3", "r16_4", "r16_5", "r16_6", "r16_7", "r16_8", "qf_1", "qf_2", "qf_3", "qf_4", "sf_1", "sf_2", "p3", "fin"];
 
@@ -142,51 +141,41 @@ let AP = {de:'Mama',grp:'Mama',ko:'Mama',fin:'Mama'};
 function setSyncStatus(state, label) {
   const dot = document.getElementById('sync-dot');
   const lbl = document.getElementById('sync-label');
+  if (!dot || !lbl) return;
   dot.className = 'sync-dot' + (state==='saving'?' saving':state==='error'?' error':'');
   lbl.textContent = label;
 }
 
-async function loadFromCloud() {
-  setSyncStatus('saving','Lade…');
-  try {
-    const r = await fetch(FB_URL + '/tipps.json');
-    if (!r.ok) throw new Error(r.status);
-    const d = await r.json();
-    DB = (d && typeof d === 'object') ? d : {};
-    populateAll(); calcScores();
-    setSyncStatus('ok','Synchronisiert ✓');
-  } catch(e) {
-    setSyncStatus('error','Offline – lokale Daten');
-    try { DB = JSON.parse(localStorage.getItem('wm26hf')||'{}'); populateAll(); calcScores(); } catch(_) {}
-  }
+function loadFromCloud() {
+  try { DB = JSON.parse(localStorage.getItem('wm26hf')||'{}'); } catch(_) { DB={}; }
+  populateAll(); calcScores();
+  setSyncStatus('ok','Bereit');
 }
 
-async function saveToCloud() {
-  setSyncStatus('saving','Speichere…');
+function saveToCloud() {
   collectAll();
   try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
-  try {
-    const r = await fetch(FB_URL + '/tipps.json', {
-      method: 'PUT',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(DB)
-    });
-    if (!r.ok) throw new Error(r.status);
-    setSyncStatus('ok','Gespeichert ✓');
-    calcScores();
-  } catch(e) {
-    setSyncStatus('error','Fehler: ' + e.message.substring(0,60));
-  }
+  // Embed data into HTML and trigger download
+  const marker = '/*__DATA__*/';
+  const script = '<sc' + 'ript>var __SAVED__=' + JSON.stringify(DB) + ';</sc' + 'ript>';
+  let out = document.documentElement.outerHTML;
+  // inject saved data right before closing body
+  out = out.replace('</body>', script + '</body>');
+  const blob = new Blob([out], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'h-family-wm-tippspiel.html';
+  a.click();
+  setSyncStatus('ok','Gespeichert & heruntergeladen ✓');
+  calcScores();
 }
 
 function debounceSave() {
   calcScores();
-  clearTimeout(saveTimer);
-  setSyncStatus('saving','Tippen…');
-  saveTimer = setTimeout(saveToCloud, 1800);
+  try { collectAll(); localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
 }
 
-function forceSave() { clearTimeout(saveTimer); saveToCloud(); }
+function forceSave() { saveToCloud(); }
 
 function collectAll() {
   document.querySelectorAll('.tip-score').forEach(el => {
@@ -291,6 +280,11 @@ function calcScores() {
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  // Load embedded data from previously saved file
+  if (typeof __SAVED__ !== 'undefined' && __SAVED__) {
+    DB = __SAVED__;
+    try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
+  }
   const gt=document.getElementById('gt-A');
   if(gt){gt.classList.add('active');document.getElementById('gp-A').classList.add('active');}
   hlAll();
