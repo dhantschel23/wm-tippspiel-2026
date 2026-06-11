@@ -130,10 +130,20 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
   <button class="btn btn-primary" onclick="forceSave()">Jetzt speichern</button>
 </div>
 <script>
-const API_KEY = '$2a$10$KIqCQE2IItkPEWBR0lq6Q.pMw96hqfy4VbysNttD4eX2JAfjhEDA2';
-const BIN_ID  = '6a2b071cf5f4af5e29e17c4a';
-const URL_GET = 'https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest';
-const URL_PUT = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+// GitHub storage backend
+const GH_OWNER = 'dhantschel23';
+const GH_REPO  = 'wm-tippspiel-2026';
+const GH_FILE  = 'data.json';
+const GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+let fileSha = null;
+let GH_TOKEN = localStorage.getItem('wm26_ghtoken') || '';
+function ensureToken() {
+  if (!GH_TOKEN) {
+    GH_TOKEN = prompt('Einmalig: GitHub Token eingeben (wird lokal gespeichert):') || '';
+    if (GH_TOKEN) localStorage.setItem('wm26_ghtoken', GH_TOKEN);
+  }
+  return !!GH_TOKEN;
+}
 const PERSONS = ["Mama", "Papa", "Lennox", "Phil"];
 const ALL_GIDS = ["a1", "a2", "a3", "a4", "a5", "a6", "b1", "b2", "b3", "b4", "b5", "b6", "c1", "c2", "c3", "c4", "c5", "c6", "d1", "d2", "d3", "d4", "d5", "d6", "de1", "e2", "de2", "e3", "de3", "e6", "f1", "f2", "f3", "f4", "f5", "f6", "g1", "g2", "g3", "g4", "g5", "g6", "h1", "h2", "h3", "h4", "h5", "h6", "i1", "i2", "i3", "i4", "i5", "i6", "j1", "j2", "j3", "j4", "j5", "j6", "k1", "k2", "k3", "k4", "k5", "k6", "l1", "l2", "l3", "l4", "l5", "l6", "r32_1", "r32_2", "r32_3", "r32_4", "r32_5", "r32_6", "r32_7", "r32_8", "r32_9", "r32_10", "r32_11", "r32_12", "r32_13", "r32_14", "r32_15", "r32_16", "r16_1", "r16_2", "r16_3", "r16_4", "r16_5", "r16_6", "r16_7", "r16_8", "qf_1", "qf_2", "qf_3", "qf_4", "sf_1", "sf_2", "p3", "fin"];
 
@@ -151,7 +161,8 @@ function setSyncStatus(state, label) {
 async function loadFromCloud() {
   setSyncStatus('saving','Lade…');
   try {
-    const r = await fetch(URL_GET, {headers:{'X-Master-Key':API_KEY,'X-Bin-Meta':'false'}});
+    // use raw content URL to avoid CORS issues with auth header
+    const r = await fetch('https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/main/' + GH_FILE + '?t=' + Date.now());
     if (!r.ok) throw new Error(r.status);
     DB = await r.json();
     if (!DB || typeof DB !== 'object') DB = {};
@@ -161,23 +172,38 @@ async function loadFromCloud() {
     setSyncStatus('error','Offline – lokale Daten');
     try { DB = JSON.parse(localStorage.getItem('wm26hf')||'{}'); populateAll(); calcScores(); } catch(_) {}
   }
+  // also fetch sha for writes
+  try {
+    const r2 = await fetch(GH_API, {headers:{'Authorization':'token '+GH_TOKEN,'User-Agent':'tippspiel'}});
+    if (r2.ok) { const d = await r2.json(); fileSha = d.sha; }
+  } catch(_) {}
 }
 
 async function saveToCloud() {
+  if (!ensureToken()) { setSyncStatus('error','Kein Token'); return; }
   setSyncStatus('saving','Speichere…');
   collectAll();
   try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
   try {
-    const r = await fetch(URL_PUT, {
-      method:'PUT',
-      headers:{'Content-Type':'application/json','X-Master-Key':API_KEY},
-      body: JSON.stringify(DB)
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DB))));
+    const body = {message:'update tipps', content: content};
+    if (fileSha) body.sha = fileSha;
+    const r = await fetch(GH_API, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + GH_TOKEN,
+        'Content-Type': 'application/json',
+        'User-Agent': 'tippspiel'
+      },
+      body: JSON.stringify(body)
     });
-    if (!r.ok) throw new Error(r.status);
+    if (!r.ok) { const err = await r.text(); throw new Error(r.status + ' ' + err); }
+    const d = await r.json();
+    fileSha = d.content.sha;
     setSyncStatus('ok','Gespeichert ✓');
     calcScores();
   } catch(e) {
-    setSyncStatus('error','Cloud-Fehler – lokal gesichert');
+    setSyncStatus('error','Fehler: ' + e.message);
   }
 }
 
