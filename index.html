@@ -111,6 +111,7 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
   <div class="sync-bar">
     <span class="sync-dot" id="sync-dot"></span>
     <span id="sync-label">Bereit</span>
+    <button onclick="fetchResults()" style="margin-left:12px;padding:3px 12px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:4px;cursor:pointer;" id="fetch-btn">&#x27F3; Ergebnisse laden</button>
   </div>
 </header>
 <nav class="nav-tabs">
@@ -290,6 +291,44 @@ document.addEventListener('DOMContentLoaded',()=>{
   hlAll();
   loadFromCloud();
 });
+
+// Auto-fetch results from openfootball
+const GAME_MAP = {"Mexico|South Africa":"a1","South Korea|Czech Republic":"a2","Czech Republic|South Africa":"a3","South Africa|South Korea":"a4","Czech Republic|Mexico":"a5","Mexico|South Korea":"a6","Canada|Bosnia & Herzegovina":"b1","Qatar|Switzerland":"b2","Switzerland|Bosnia & Herzegovina":"b3","Canada|Qatar":"b4","Switzerland|Canada":"b5","Bosnia & Herzegovina|Qatar":"b6","Brazil|Morocco":"c1","Haiti|Scotland":"c2","Scotland|Morocco":"c3","Brazil|Haiti":"c4","Scotland|Brazil":"c5","Morocco|Haiti":"c6","USA|Paraguay":"d1","Australia|Turkey":"d2","USA|Australia":"d3","Turkey|Paraguay":"d4","Turkey|USA":"d5","Paraguay|Australia":"d6","Germany|Cura\u00e7ao":"de1","Ivory Coast|Ecuador":"e2","Germany|Ivory Coast":"de2","Ecuador|Cura\u00e7ao":"e3","Cura\u00e7ao|Ivory Coast":"e6","Ecuador|Germany":"de3","Netherlands|Japan":"f1","Sweden|Tunisia":"f2","Netherlands|Sweden":"f3","Tunisia|Japan":"f4","Japan|Sweden":"f5","Tunisia|Netherlands":"f6","Belgium|Egypt":"g1","Iran|New Zealand":"g2","Belgium|Iran":"g3","New Zealand|Egypt":"g4","Egypt|Iran":"g5","New Zealand|Belgium":"g6","Spain|Cape Verde":"h1","Saudi Arabia|Uruguay":"h2","Spain|Saudi Arabia":"h3","Uruguay|Cape Verde":"h4","Cape Verde|Saudi Arabia":"h5","Uruguay|Spain":"h6","France|Senegal":"i1","Iraq|Norway":"i2","France|Iraq":"i3","Norway|Senegal":"i4","Norway|France":"i5","Senegal|Iraq":"i6","Argentina|Algeria":"j1","Austria|Jordan":"j2","Argentina|Austria":"j3","Jordan|Algeria":"j4","Algeria|Austria":"j5","Jordan|Argentina":"j6","Portugal|DR Congo":"k1","Uzbekistan|Colombia":"k2","Portugal|Uzbekistan":"k3","Colombia|DR Congo":"k4","Colombia|Portugal":"k5","DR Congo|Uzbekistan":"k6","England|Croatia":"l1","Ghana|Panama":"l2","England|Ghana":"l3","Panama|Croatia":"l4","Panama|England":"l5","Croatia|Ghana":"l6"};
+
+async function fetchResults() {
+  const btn = document.getElementById('fetch-btn');
+  if (btn) btn.textContent = '⟳ Lade…';
+  setSyncStatus('saving', 'Lade Ergebnisse…');
+  try {
+    const r = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json?t=' + Date.now());
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    let updated = 0;
+    data.matches.forEach(m => {
+      if (!m.score) return;
+      const key = m.team1 + '|' + m.team2;
+      const gid = GAME_MAP[key];
+      if (!gid) return;
+      const ft = m.score.ft;
+      if (!ft || ft.length < 2) return;
+      const rh = document.getElementById('res-' + gid + '-h');
+      const ra = document.getElementById('res-' + gid + '-a');
+      if (rh && ra) {
+        rh.value = ft[0];
+        ra.value = ft[1];
+        updated++;
+      }
+    });
+    setSyncStatus('ok', updated + ' Ergebnisse aktualisiert ✓');
+    if (btn) btn.textContent = '✓ ' + updated + ' aktualisiert';
+    setTimeout(() => { if(btn) btn.textContent = '⟳ Ergebnisse laden'; }, 3000);
+    saveToCloud();
+  } catch(e) {
+    setSyncStatus('error', 'Ladefehler: ' + e.message);
+    if (btn) btn.textContent = '⟳ Ergebnisse laden';
+  }
+}
+
 </script>
 </body>
 </html>
