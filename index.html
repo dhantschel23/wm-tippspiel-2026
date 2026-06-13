@@ -129,8 +129,11 @@ body{background:var(--bg);color:var(--txt);font-family:'Inter',sans-serif;font-s
 <div id="sec-finale" class="section"><div class="sec-title">Finale &amp; Platz 3</div><div class="person-switcher" id="ps-fin"><button class="pbtn active" onclick="setP('Mama',this,'fin')">Mama</button><button class="pbtn" onclick="setP('Papa',this,'fin')">Papa</button><button class="pbtn" onclick="setP('Lennox',this,'fin')">Lennox</button><button class="pbtn" onclick="setP('Phil',this,'fin')">Phil</button></div><div class="finale-grid"><div class="fin-card"><div class="fin-hdr p3">Platz 3 — 18. Jul.</div><div class="fin-res-row"><span class="rlabel" style="color:var(--green)">Ergebnis</span><input class="result-input" id="res-p3-h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="rsep">:</span><input class="result-input" id="res-p3-a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div><table class="fin-table" id="ft-p3"><tr data-person="Mama"><td class="td-name">Mama</td><td><div class="tip-wrap"><input class="tip-score" data-game="p3" data-person="Mama" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="p3" data-person="Mama" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Papa"><td class="td-name">Papa</td><td><div class="tip-wrap"><input class="tip-score" data-game="p3" data-person="Papa" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="p3" data-person="Papa" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Lennox"><td class="td-name">Lennox</td><td><div class="tip-wrap"><input class="tip-score" data-game="p3" data-person="Lennox" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="p3" data-person="Lennox" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Phil"><td class="td-name">Phil</td><td><div class="tip-wrap"><input class="tip-score" data-game="p3" data-person="Phil" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="p3" data-person="Phil" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr></table></div><div class="fin-card"><div class="fin-hdr fin">Finale — 19. Jul.</div><div class="fin-res-row"><span class="rlabel" style="color:var(--green)">Ergebnis</span><input class="result-input" id="res-fin-h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="rsep">:</span><input class="result-input" id="res-fin-a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div><table class="fin-table" id="ft-fin"><tr data-person="Mama"><td class="td-name">Mama</td><td><div class="tip-wrap"><input class="tip-score" data-game="fin" data-person="Mama" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="fin" data-person="Mama" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Papa"><td class="td-name">Papa</td><td><div class="tip-wrap"><input class="tip-score" data-game="fin" data-person="Papa" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="fin" data-person="Papa" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Lennox"><td class="td-name">Lennox</td><td><div class="tip-wrap"><input class="tip-score" data-game="fin" data-person="Lennox" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="fin" data-person="Lennox" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr><tr data-person="Phil"><td class="td-name">Phil</td><td><div class="tip-wrap"><input class="tip-score" data-game="fin" data-person="Phil" data-side="h" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"><span class="tsep">:</span><input class="tip-score" data-game="fin" data-person="Phil" data-side="a" type="number" min="0" max="30" placeholder="–" oninput="debounceSave()"></div></td></tr></table></div><div class="fin-card"><div class="fin-hdr wm">Weltmeister-Tipp</div><div class="fin-res-row"><span style="font-size:10px;color:var(--muted)">Sieger: <strong id="wm-winner">–</strong></span></div><table class="fin-table" id="ft-wm"><tr data-person="Mama"><td class="td-name">Mama</td><td><input class="wm-inp" id="wm-Mama" type="text" placeholder="Land tippen…" oninput="debounceSave()"></td></tr><tr data-person="Papa"><td class="td-name">Papa</td><td><input class="wm-inp" id="wm-Papa" type="text" placeholder="Land tippen…" oninput="debounceSave()"></td></tr><tr data-person="Lennox"><td class="td-name">Lennox</td><td><input class="wm-inp" id="wm-Lennox" type="text" placeholder="Land tippen…" oninput="debounceSave()"></td></tr><tr data-person="Phil"><td class="td-name">Phil</td><td><input class="wm-inp" id="wm-Phil" type="text" placeholder="Land tippen…" oninput="debounceSave()"></td></tr></table></div></div></div>
 <div id="sec-wertung" class="section"><div class="sec-title">Wertung</div><div class="info-box"><strong>Punkte:</strong> Genaues Ergebnis = <strong style="color:var(--usab)">3</strong> &nbsp;|&nbsp; Richtiger Sieger/Unentschieden = <strong style="color:var(--usab)">1</strong> &nbsp;|&nbsp; Weltmeister richtig = <strong style="color:var(--gold)">5</strong></div><div class="scoreboard"><div class="sb-header">Rangliste</div><div class="sb-row head"><div>#</div><div>Name</div><div class="pts">Punkte</div><div class="correct">Genau</div><div class="stot">Getippt</div><div></div></div><div id="sb-body"></div></div></div>
 <div class="save-bar">
-  <button class="btn btn-ghost">Zurücksetzen</button>
-  <button class="btn btn-primary">Speichern &amp; Download</button>
+  <span class="save-hint" style="font-size:10px;color:rgba(255,255,255,.45);margin-right:auto;">Automatisch im Browser gespeichert</span>
+  <button class="btn btn-ghost" id="clear-btn">Zurücksetzen</button>
+  <label class="btn btn-ghost" for="import-file" style="margin:0;">Tipps importieren</label>
+  <input type="file" id="import-file" accept="application/json" style="display:none;">
+  <button class="btn btn-primary" id="export-btn">Tipps exportieren</button>
 </div>
 <script>
 const PERSONS = ["Mama", "Papa", "Lennox", "Phil"];
@@ -151,22 +154,37 @@ function setSyncStatus(state, label) {
 
 function loadFromCloud() {
   try { DB = JSON.parse(localStorage.getItem('wm26hf')||'{}'); } catch(_) { DB={}; }
-  if (typeof __SAVED__ !== 'undefined' && __SAVED__ && Object.keys(__SAVED__).length > 0) DB = __SAVED__;
   populateAll(); calcScores();
   setSyncStatus('ok','Bereit');
 }
 
-function saveToCloud() {
+function exportData() {
   collectAll();
   try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
-  const out = document.documentElement.outerHTML.replace('</body>','<script>var __SAVED__='+JSON.stringify(DB)+';<\/script></body>');
-  const blob = new Blob([out],{type:'text/html'});
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'h-family-wm-tippspiel.html';
+  a.download = 'wm-tipps.json';
   a.click();
-  setSyncStatus('ok','Gespeichert & heruntergeladen ✓');
-  calcScores();
+  setSyncStatus('ok','Tipps exportiert ✓');
+}
+
+function importData(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (typeof imported !== 'object' || imported === null) throw new Error('Ungültiges Format');
+      DB = Object.assign({}, DB, imported);
+      try { localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
+      populateAll();
+      calcScores();
+      setSyncStatus('ok','Tipps importiert ✓');
+    } catch(err) {
+      setSyncStatus('error','Import-Fehler: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 function debounceSave() {
@@ -174,8 +192,6 @@ function debounceSave() {
   try { collectAll(); localStorage.setItem('wm26hf', JSON.stringify(DB)); } catch(_) {}
   setSyncStatus('ok','Im Browser gespeichert');
 }
-
-function forceSave() { saveToCloud(); }
 
 function collectAll() {
   document.querySelectorAll('.tip-score').forEach(el=>{
@@ -318,8 +334,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   hlAll();
   loadFromCloud();
   document.getElementById('fetch-btn').addEventListener('click', fetchResults);
-  document.querySelector('.btn-primary').addEventListener('click', forceSave);
-  document.querySelector('.btn-ghost').addEventListener('click', clearAll);
+  document.getElementById('export-btn').addEventListener('click', exportData);
+  document.getElementById('clear-btn').addEventListener('click', clearAll);
+  document.getElementById('import-file').addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) importData(e.target.files[0]);
+  });
 });
 </script>
 </body>
